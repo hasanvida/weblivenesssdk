@@ -1,35 +1,28 @@
 <!DOCTYPE html>
 
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>VIDA Liveness Full Instruction Test</title>
+  <title>VIDA Liveness Full Mapping Test</title>
 
-  <!-- Force reload SDK -->
+  <!-- Force reload -->
 
-  <script src="https://web-sdk.vida.id/1.1.0/sandbox/vida-web-sdk.js?v=777"></script>
+  <script src="https://web-sdk.vida.id/1.1.0/sandbox/vida-web-sdk.js?v=9999"></script>
 
   <style>
     body {
-      margin: 0;
+      font-family: Arial;
       padding: 40px;
-      font-family: Arial, sans-serif;
       background: #f3f5f9;
     }
-
     button {
-      padding: 14px 20px;
+      padding: 12px 18px;
       background: #16a34a;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
-    }
-
-    #sdk-container {
-      margin-top: 20px;
-      min-height: 420px;
     }
   </style>
 
@@ -37,9 +30,8 @@
 
 <body>
 
-<h2>VIDA Liveness - Full Instruction Test</h2>
-
-<button onclick="startLiveness()">Start Test</button>
+<h2>VIDA Tutorial Mapping Test</h2>
+<button onclick="start()">Start Test</button>
 
 <div id="sdk-container"></div>
 
@@ -49,7 +41,7 @@ async function getToken() {
   return await res.json();
 }
 
-async function startLiveness() {
+async function start() {
   document.getElementById("sdk-container").innerHTML = "";
 
   const data = await getToken();
@@ -60,26 +52,33 @@ async function startLiveness() {
     workflow: "liveness",
     elementId: "sdk-container",
     userId: "test-user",
-    locale: "ID",
 
-    /* 🔥 FULL TEST CONFIG */
+    // 🔥 MUST BE EN
+    locale: "EN",
+
     localeConfigs: {
-      livenessTutorial: {
-        title: "TEST TITLE",
-        description: "TEST DESCRIPTION",
+      liveness: {
+        EN: {
+          livenessTutorial: {
+            title: "TEST TITLE",
+            description: "TEST DESCRIPTION",
 
-        instructions: {
-          "instructions.faceCamera": "TEST faceCamera",
-          "instructions.faceClear": "TEST faceClear",
-          "instructions.singleFace": "TEST singleFace",
-          "instructions.avoidDark": "TEST avoidDark",
+            instructions: {
+              // 🔴 Deprecated ones
+              faceCamera: "TEST faceCamera",
+              faceClear: "TEST faceClear",
+              singleFace: "TEST singleFace",
+              avoidDark: "TEST avoidDark",
 
-          "instructions.holdPhoneSteady": "TEST holdPhoneSteady",
-          "instructions.avoidBrightPlace": "TEST avoidBrightPlace",
-          "instructions.avoidGlasses": "TEST avoidGlasses"
-        },
+              // 🟢 New ones (v1.1.0)
+              holdPhoneSteady: "TEST holdPhoneSteady",
+              avoidBrightPlace: "TEST avoidBrightPlace",
+              avoidGlasses: "TEST avoidGlasses"
+            },
 
-        actionButton: "TEST BUTTON"
+            actionButton: "TEST BUTTON"
+          }
+        }
       }
     },
 
@@ -90,13 +89,8 @@ async function startLiveness() {
       }
     },
 
-    onComplete: (res) => {
-      console.log("SUCCESS", res);
-    },
-
-    onError: (err) => {
-      console.error("ERROR", err);
-    }
+    onComplete: (res) => console.log("SUCCESS", res),
+    onError: (err) => console.error("ERROR", err)
   });
 }
 </script>
