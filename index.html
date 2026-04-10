@@ -5,26 +5,57 @@
   <meta charset="UTF-8" />
   <title>VIDA Liveness Demo</title>
 
+  <!-- VIDA Web SDK -->
+
   <script src="https://web-sdk.vida.id/1.1.0/sandbox/vida-web-sdk.js"></script>
 
   <style>
     body {
-      font-family: Arial;
+      margin: 0;
       padding: 40px;
+      font-family: "Segoe UI", Arial, sans-serif;
       background: #f3f5f9;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
     }
 
     button {
-      padding: 12px 20px;
+      padding: 14px 20px;
       background: #16a34a;
       color: white;
       border: none;
       border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
     }
 
     #sdk-container {
+      margin-top: 24px;
+      min-height: 400px;
+    }
+
+    .result-box {
       margin-top: 20px;
+      background: #0b1220;
+      color: #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 12px;
+      white-space: pre-wrap;
+      display: none;
     }
   </style>
 
@@ -32,60 +63,79 @@
 
 <body>
 
-<h2>VIDA Liveness Demo</h2>
+<div class="container">
+  <h1>VIDA Liveness Demo</h1>
 
-<button onclick="startLiveness()">Start Liveness</button>
+<button onclick="startLiveness()">Mulai Liveness</button>
 
-<div id="sdk-container"></div>
+  <div id="sdk-container"></div>
+
+  <div id="result-box" class="result-box"></div>
+</div>
 
 <script>
-async function getToken() {
-  const res = await fetch("/.netlify/functions/get-token");
-  return await res.json();
-}
+  function showResult(data) {
+    const box = document.getElementById("result-box");
+    box.style.display = "block";
+    box.textContent = JSON.stringify(data, null, 2);
+  }
 
-async function startLiveness() {
-  const data = await getToken();
+  async function getToken() {
+    const res = await fetch("/.netlify/functions/get-token");
+    return await res.json();
+  }
 
-  VidaSDK.init({
-    token: data.access_token,
-    signingKey: data.signing_key,
-    workflow: "liveness",
-    elementId: "sdk-container",
-    userId: "user-demo-123",
-    locale: "ID",
+  async function startLiveness() {
+    try {
+      document.getElementById("sdk-container").innerHTML = "";
 
-    localeConfigs: {
-      livenessTutorial: {
-        title: "Verifikasi Wajah",
-        description: "Ikuti instruksi berikut",
-        instructions: {
-          holdPhoneSteady: "Pastikan perangkat tidak bergerak",
-          avoidGlasses: "Lepaskan kacamata",
-          avoidBrightPlace: "Hindari cahaya terlalu terang"
+      const data = await getToken();
+
+      VidaSDK.init({
+        token: data.access_token,
+        signingKey: data.signing_key,
+        workflow: "liveness",
+        elementId: "sdk-container",
+        userId: "demo-user-123",
+        locale: "ID",
+
+        /* 🔥 CUSTOM TUTORIAL */
+        localeConfigs: {
+          livenessTutorial: {
+            title: "Ambil Swafoto",
+            description: "Pastikan Anda mengikuti panduan berikut",
+
+            instructions: {
+              holdPhoneSteady: "Wajah sepenuhnya terlihat jelas dengan pencahayaan cukup",
+              avoidGlasses: "Wajah tidak terhalang rambut/aksesoris"
+            },
+
+            actionButton: "Mulai Pengambilan Selfie"
+          }
         },
-        actionButton: "Mulai"
-      }
-    },
 
-    workflowConfigs: {
-      liveness: {
-        maxRetryAttempts: 3,
-        detectionTimeOut: 90000
-      }
-    },
+        workflowConfigs: {
+          liveness: {
+            maxRetryAttempts: 3,
+            detectionTimeOut: 90000
+          }
+        },
 
-    onComplete: (res) => {
-      console.log("SUCCESS", res);
-      alert("Liveness success!");
-    },
+        onComplete: (result) => {
+          console.log("SUCCESS", result);
+          showResult(result);
+        },
 
-    onError: (err) => {
-      console.error("ERROR", err);
-      alert("Liveness failed");
+        onError: (error) => {
+          console.error("ERROR", error);
+          showResult(error);
+        }
+      });
+
+    } catch (e) {
+      showResult({ error: e.message });
     }
-  });
-}
+  }
 </script>
 
 </body>
