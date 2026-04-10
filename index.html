@@ -3,17 +3,17 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>VIDA Liveness Test</title>
+  <title>VIDA Liveness Full Instruction Test</title>
 
-  <!-- FORCE reload SDK -->
+  <!-- Force reload SDK -->
 
-  <script src="https://web-sdk.vida.id/1.1.0/sandbox/vida-web-sdk.js?v=999"></script>
+  <script src="https://web-sdk.vida.id/1.1.0/sandbox/vida-web-sdk.js?v=777"></script>
 
   <style>
     body {
       margin: 0;
       padding: 40px;
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       background: #f3f5f9;
     }
 
@@ -24,11 +24,12 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      font-weight: bold;
     }
 
     #sdk-container {
       margin-top: 20px;
-      min-height: 400px;
+      min-height: 420px;
     }
   </style>
 
@@ -36,7 +37,7 @@
 
 <body>
 
-<h2>VIDA Liveness Instruction Test</h2>
+<h2>VIDA Liveness - Full Instruction Test</h2>
 
 <button onclick="startLiveness()">Start Test</button>
 
@@ -61,12 +62,24 @@ async function startLiveness() {
     userId: "test-user",
     locale: "ID",
 
+    /* 🔥 FULL TEST CONFIG */
     localeConfigs: {
       livenessTutorial: {
+        title: "TEST TITLE",
+        description: "TEST DESCRIPTION",
+
         instructions: {
-          avoidGlasses: "point 1 test",
-          avoidBrightPlace: "point 2 test"
-        }
+          "instructions.faceCamera": "TEST faceCamera",
+          "instructions.faceClear": "TEST faceClear",
+          "instructions.singleFace": "TEST singleFace",
+          "instructions.avoidDark": "TEST avoidDark",
+
+          "instructions.holdPhoneSteady": "TEST holdPhoneSteady",
+          "instructions.avoidBrightPlace": "TEST avoidBrightPlace",
+          "instructions.avoidGlasses": "TEST avoidGlasses"
+        },
+
+        actionButton: "TEST BUTTON"
       }
     },
 
