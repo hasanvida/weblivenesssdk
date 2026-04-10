@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>VIDA Liveness Demo</title>
+
+  <script src="https://web-sdk.vida.id/1.1.0/sandbox/vida-web-sdk.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      padding: 40px;
+      background: #f3f5f9;
+    }
+
+    button {
+      padding: 12px 20px;
+      background: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #sdk-container {
+      margin-top: 20px;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<h2>VIDA Liveness Demo</h2>
+
+<button onclick="startLiveness()">Start Liveness</button>
+
+<div id="sdk-container"></div>
+
+<script>
+async function getToken() {
+  const res = await fetch("/.netlify/functions/get-token");
+  return await res.json();
+}
+
+async function startLiveness() {
+  const data = await getToken();
+
+  VidaSDK.init({
+    token: data.access_token,
+    signingKey: data.signing_key,
+    workflow: "liveness",
+    elementId: "sdk-container",
+    userId: "user-demo-123",
+    locale: "ID",
+
+    localeConfigs: {
+      livenessTutorial: {
+        title: "Verifikasi Wajah",
+        description: "Ikuti instruksi berikut",
+        instructions: {
+          holdPhoneSteady: "Pastikan perangkat tidak bergerak",
+          avoidGlasses: "Lepaskan kacamata",
+          avoidBrightPlace: "Hindari cahaya terlalu terang"
+        },
+        actionButton: "Mulai"
+      }
+    },
+
+    workflowConfigs: {
+      liveness: {
+        maxRetryAttempts: 3,
+        detectionTimeOut: 90000
+      }
+    },
+
+    onComplete: (res) => {
+      console.log("SUCCESS", res);
+      alert("Liveness success!");
+    },
+
+    onError: (err) => {
+      console.error("ERROR", err);
+      alert("Liveness failed");
+    }
+  });
+}
+</script>
+
+</body>
+</html>
