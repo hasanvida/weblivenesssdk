@@ -3,33 +3,18 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>VIDA Liveness Demo</title>
+  <title>VIDA Liveness Test</title>
 
-  <!-- VIDA Web SDK -->
+  <!-- FORCE reload SDK -->
 
-  <script src="https://web-sdk.vida.id/1.1.0/sandbox/vida-web-sdk.js"></script>
+  <script src="https://web-sdk.vida.id/1.1.0/sandbox/vida-web-sdk.js?v=999"></script>
 
   <style>
     body {
       margin: 0;
       padding: 40px;
-      font-family: "Segoe UI", Arial, sans-serif;
+      font-family: Arial;
       background: #f3f5f9;
-      color: #1f2937;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: #ffffff;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-    }
-
-    h1 {
-      margin-top: 0;
-      margin-bottom: 16px;
     }
 
     button {
@@ -38,25 +23,12 @@
       color: white;
       border: none;
       border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
       cursor: pointer;
     }
 
     #sdk-container {
-      margin-top: 24px;
-      min-height: 420px;
-    }
-
-    .result-box {
       margin-top: 20px;
-      background: #0b1220;
-      color: #e5e7eb;
-      border-radius: 8px;
-      padding: 16px;
-      font-size: 12px;
-      white-space: pre-wrap;
-      display: none;
+      min-height: 400px;
     }
   </style>
 
@@ -64,87 +36,56 @@
 
 <body>
 
-<div class="container">
-  <h1>VIDA Liveness Demo</h1>
+<h2>VIDA Liveness Instruction Test</h2>
 
-<button onclick="startLiveness()">Mulai Liveness</button>
+<button onclick="startLiveness()">Start Test</button>
 
-  <div id="sdk-container"></div>
-
-  <div id="result-box" class="result-box"></div>
-</div>
+<div id="sdk-container"></div>
 
 <script>
-  function showResult(data) {
-    const box = document.getElementById("result-box");
-    box.style.display = "block";
-    box.textContent = JSON.stringify(data, null, 2);
-  }
+async function getToken() {
+  const res = await fetch("/.netlify/functions/get-token");
+  return await res.json();
+}
 
-  async function getToken() {
-    const res = await fetch("/.netlify/functions/get-token");
-    return await res.json();
-  }
+async function startLiveness() {
+  document.getElementById("sdk-container").innerHTML = "";
 
-  async function startLiveness() {
-    try {
-      document.getElementById("sdk-container").innerHTML = "";
+  const data = await getToken();
 
-      const data = await getToken();
+  VidaSDK.init({
+    token: data.access_token,
+    signingKey: data.signing_key,
+    workflow: "liveness",
+    elementId: "sdk-container",
+    userId: "test-user",
+    locale: "ID",
 
-      VidaSDK.init({
-        token: data.access_token,
-        signingKey: data.signing_key,
-        workflow: "liveness",
-        elementId: "sdk-container",
-        userId: "demo-user-123",
-        locale: "ID",
-
-        /* 🔥 FORCE CUSTOM TUTORIAL (both keys) */
-        localeConfigs: {
-          tutorial: {
-            title: "Ambil Swafoto",
-            description: "Pastikan Anda mengikuti panduan berikut",
-            instructions: {
-              faceCamera: "Wajah sepenuhnya terlihat jelas dengan pencahayaan cukup",
-              faceClear: "Wajah tidak terhalang rambut/aksesoris"
-            },
-            actionButton: "Mulai Pengambilan Selfie"
-          },
-
-          livenessTutorial: {
-            title: "Ambil Swafoto",
-            description: "Pastikan Anda mengikuti panduan berikut",
-            instructions: {
-              holdPhoneSteady: "Wajah sepenuhnya terlihat jelas dengan pencahayaan cukup",
-              avoidGlasses: "Wajah tidak terhalang rambut/aksesoris"
-            },
-            actionButton: "Mulai Pengambilan Selfie"
-          }
-        },
-
-        workflowConfigs: {
-          liveness: {
-            maxRetryAttempts: 3,
-            detectionTimeOut: 90000
-          }
-        },
-
-        onComplete: (result) => {
-          console.log("SUCCESS", result);
-          showResult(result);
-        },
-
-        onError: (error) => {
-          console.error("ERROR", error);
-          showResult(error);
+    localeConfigs: {
+      livenessTutorial: {
+        instructions: {
+          avoidGlasses: "point 1 test",
+          avoidBrightPlace: "point 2 test"
         }
-      });
+      }
+    },
 
-    } catch (e) {
-      showResult({ error: e.message });
+    workflowConfigs: {
+      liveness: {
+        maxRetryAttempts: 3,
+        detectionTimeOut: 90000
+      }
+    },
+
+    onComplete: (res) => {
+      console.log("SUCCESS", res);
+    },
+
+    onError: (err) => {
+      console.error("ERROR", err);
     }
-  }
+  });
+}
 </script>
 
 </body>
