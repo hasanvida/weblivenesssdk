@@ -1,11 +1,8 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>VIDA Liveness Full Mapping Test</title>
-
-  <!-- Force reload -->
 
   <script src="https://web-sdk.vida.id/1.1.0/sandbox/vida-web-sdk.js?v=9999"></script>
 
@@ -24,8 +21,25 @@
       cursor: pointer;
       font-weight: bold;
     }
+    #result-box {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      display: none;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+    .success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #22c55e;
+    }
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
   </style>
-
 </head>
 
 <body>
@@ -35,14 +49,26 @@
 
 <div id="sdk-container"></div>
 
+<!-- ✅ Result Display -->
+<div id="result-box"></div>
+
 <script>
 async function getToken() {
   const res = await fetch("/.netlify/functions/get-token");
   return await res.json();
 }
 
+function showResult(type, data) {
+  const box = document.getElementById("result-box");
+  box.style.display = "block";
+  box.className = type === "success" ? "success" : "error";
+
+  box.textContent = JSON.stringify(data, null, 2);
+}
+
 async function start() {
   document.getElementById("sdk-container").innerHTML = "";
+  document.getElementById("result-box").style.display = "none";
 
   const data = await getToken();
 
@@ -53,30 +79,23 @@ async function start() {
     elementId: "sdk-container",
     userId: "test-user",
 
-    // 🔥 MUST BE EN
     locale: "EN",
 
     localeConfigs: {
       liveness: {
         EN: {
           livenessTutorial: {
-            
-
             instructions: {
-              // 🔴 Deprecated ones
               faceCamera: "TEST faceCamera",
               faceClear: "TEST faceClear",
               singleFace: "TEST singleFace",
               avoidDark: "TEST avoidDark",
 
-              // 🟢 New ones (v1.1.0)
               holdPhoneSteady: "TEST holdPhoneSteady",
               avoidBrightPlace: "TEST avoidBrightPlace",
               avoidGlasses: "TEST avoidGlasses\nBariskedua",
               faceFullyVisible: "TEST faceFullyVisible\nbaris kedua"
-            },
-
-            
+            }
           }
         }
       }
@@ -89,8 +108,16 @@ async function start() {
       }
     },
 
-    onComplete: (res) => console.log("SUCCESS", res),
-    onError: (err) => console.error("ERROR", err)
+    // ✅ SHOW ON UI
+    onComplete: (res) => {
+      console.log("SUCCESS", res);
+      showResult("success", res);
+    },
+
+    onError: (err) => {
+      console.error("ERROR", err);
+      showResult("error", err);
+    }
   });
 }
 </script>
