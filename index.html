@@ -91,11 +91,13 @@ async function start() {
   const data = await getToken();
 
   VidaSDK.init({
-    token: data.access_token,
-    signingKey: data.signing_key,
-    workflow: "liveness",
-    elementId: "sdk-container",
-    userId: "test-user",
+  token: data.access_token,
+  signingKey: data.signing_key,
+  workflow: "liveness",
+  elementId: "sdk-container",
+  userInfo: {
+    id: "test-user"
+  }
 
     locale: "EN",
 
