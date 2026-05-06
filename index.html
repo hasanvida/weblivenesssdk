@@ -2,65 +2,114 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>VIDA Liveness Full Mapping Test</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>VIDA Liveness Verification Demo</title>
   <!-- VIDA SDK -->
   <script src="https://web-sdk.vida.id/1.1.1/sandbox/vida-web-sdk.js?v=9999"></script>
-
   <style>
-    body {
-      font-family: Arial;
-      padding: 40px;
-      background: #f3f5f9;
+    * {
+      box-sizing: border-box;
     }
-
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100vh;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      padding: 24px 16px;
+      background: #f3f5f9;
+      color: #1f2937;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    h2 {
+      font-size: 1.4rem;
+      margin: 0 0 16px;
+      text-align: center;
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
     button {
-      padding: 12px 18px;
+      padding: 14px 22px;
       background: #16a34a;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
+      font-size: 1rem;
+      width: 100%;
+      max-width: 320px;
+      -webkit-tap-highlight-color: transparent;
     }
-
+    button:active {
+      background: #15803d;
+    }
+    #sdk-container {
+      width: 100%;
+      margin-top: 8px;
+    }
     #result-box {
       margin-top: 20px;
-      padding: 16px;
+      padding: 14px;
       border-radius: 8px;
       display: none;
-      font-family: monospace;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
     }
-
     .success {
       background: #dcfce7;
       color: #166534;
       border: 1px solid #22c55e;
     }
-
     .error {
       background: #fee2e2;
       color: #991b1b;
       border: 1px solid #ef4444;
     }
-
     pre {
       white-space: pre-wrap;
       word-break: break-word;
       margin: 0;
+      font-size: 0.8rem;
+    }
+
+    /* Mobile-specific tweaks */
+    @media (max-width: 480px) {
+      body {
+        padding: 16px 12px;
+      }
+      h2 {
+        font-size: 1.2rem;
+      }
+      button {
+        padding: 14px 18px;
+        font-size: 0.95rem;
+      }
+      #result-box {
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
-
 <body>
-
-<h2>VIDA Tutorial Mapping Test</h2>
-<button onclick="start()">Start Test</button>
-
-<div id="sdk-container"></div>
-
-<!-- Result Display -->
-<div id="result-box"></div>
+  <div class="container">
+    <h2>VIDA Liveness Verification Demo</h2>
+    <div class="actions">
+      <button onclick="start()">Start Liveness Check</button>
+    </div>
+    <div id="sdk-container"></div>
+    <!-- Result Display -->
+    <div id="result-box"></div>
+  </div>
 
 <script>
 async function getToken() {
@@ -72,10 +121,8 @@ function showResult(type, data) {
   const box = document.getElementById("result-box");
   box.style.display = "block";
   box.className = type === "success" ? "success" : "error";
-
   const title = type === "success" ? "✅ ON COMPLETE" : "❌ ON ERROR";
   const time = new Date().toLocaleTimeString();
-
   box.innerHTML = `
     <strong>${title}</strong><br/>
     <small>Time: ${time}</small>
@@ -87,55 +134,26 @@ function showResult(type, data) {
 async function start() {
   document.getElementById("sdk-container").innerHTML = "";
   document.getElementById("result-box").style.display = "none";
-
   const data = await getToken();
-
   VidaSDK.init({
-  token: data.access_token,
-  signingKey: data.signing_key,
-  workflow: "liveness",
-  elementId: "sdk-container",
+    token: data.access_token,
+    signingKey: data.signing_key,
+    workflow: "liveness",
+    elementId: "sdk-container",
     userInfo: {
-    id: "test-user"
-  
-  },
-
-    locale: "EN",
-
-    localeConfigs: {
-      liveness: {
-        EN: {
-          livenessTutorial: {
-            instructions: {
-              // Deprecated
-              faceCamera: "TEST faceCamera",
-              faceClear: "TEST faceClear",
-              singleFace: "TEST singleFace",
-              avoidDark: "TEST avoidDark",
-
-              // New
-              holdPhoneSteady: "TEST holdPhoneSteady",
-              avoidBrightPlace: "TEST avoidBrightPlace",
-              avoidGlasses: "TEST avoidGlasses\nBaris kedua",
-              faceFullyVisible: "TEST faceFullyVisible\nBaris kedua"
-            }
-          }
-        }
-      }
+      id: "test-user"
     },
-
+    locale: "EN",
     workflowConfigs: {
       liveness: {
         maxRetryAttempts: 3,
         detectionTimeOut: 90000
       }
     },
-
     onComplete: (res) => {
       console.log("SUCCESS", res);
       showResult("success", res);
     },
-
     onError: (err) => {
       console.error("ERROR", err);
       showResult("error", err);
@@ -143,6 +161,5 @@ async function start() {
   });
 }
 </script>
-
 </body>
 </html>
